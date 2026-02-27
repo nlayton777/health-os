@@ -1,0 +1,24 @@
+# Worktrees (Claude Code parallel sessions)
+.claude/worktrees/
+
+# Xcode
+*.xcuserstate
+*.xcworkspace/xcuserdata/
+DerivedData/
+*.moved-aside
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+xcuserdata/
+
+# Swift
+.build/
+.swiftpm/
+
+# Supabase
+.env
+supabase/.env
+
+# macOS
+.DS_Store
