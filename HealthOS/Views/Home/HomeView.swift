@@ -10,16 +10,13 @@ struct HomeView: View {
 
     var body: some View {
         TabView {
-            Tab("Today", systemImage: "sun.max.fill") {
-                TodayPlaceholderView()
-            }
-            Tab("Progress", systemImage: "chart.line.uptrend.xyaxis") {
-                Text("Progress — coming in Phase 4")
-                    .foregroundStyle(.secondary)
-            }
-            Tab("Settings", systemImage: "gearshape.fill") {
-                SettingsView()
-            }
+            TodayPlaceholderView()
+                .tabItem { Label("Today", systemImage: "sun.max.fill") }
+            Text("Progress — coming in Phase 4")
+                .foregroundStyle(.secondary)
+                .tabItem { Label("Progress", systemImage: "chart.line.uptrend.xyaxis") }
+            SettingsView()
+                .tabItem { Label("Settings", systemImage: "gearshape.fill") }
         }
         .task { await loadProfile() }
         .sheet(isPresented: $showOnboarding) {

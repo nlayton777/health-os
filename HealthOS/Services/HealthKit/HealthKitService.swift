@@ -381,7 +381,7 @@ private extension HKWorkoutActivityType {
         case .walking: return "walking"
         case .hiking: return "hiking"
         case .yoga: return "yoga"
-        case .strengthTraining: return "strength_training"
+        case .traditionalStrengthTraining: return "strength_training"
         case .functionalStrengthTraining: return "functional_strength"
         case .highIntensityIntervalTraining: return "hiit"
         default: return "other"
