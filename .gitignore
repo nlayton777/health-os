@@ -16,9 +16,15 @@ xcuserdata/
 .build/
 .swiftpm/
 
-# Supabase
+# Credentials & config (never commit real values)
 .env
+.env.*
 supabase/.env
+*.xcconfig
+!*.xcconfig.template
+*.p8
+*.pem
+*.key
 
 # macOS
 .DS_Store
