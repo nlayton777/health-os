@@ -177,8 +177,30 @@ When running parallel workstreams, one session acts as the **lead** and coordina
 
 1. **Before branching:** Define shared contracts — data models, API response shapes, function signatures — and commit them to `main` so all worktrees inherit them
 2. **During parallel work:** Monitor each session's progress; unblock dependencies as they complete
-3. **Before merging:** Review each branch for contract compliance (does the Whoop integration actually produce the normalized schema we agreed on?)
-4. **After merging:** Run integration tests; resolve any conflicts in shared files
+3. **Before merging:** Review each branch for contract compliance AND verify the build passes (see Build Verification below)
+4. **After merging:** Pull `main`, confirm the build still passes, resolve any conflicts in shared files
+
+## Build Verification (Required Before Every iOS PR)
+
+Any worktree that touches Swift files must run this before creating a PR:
+
+```bash
+# Ensure Config.xcconfig exists (copy from template if not)
+[ -f HealthOS/Config.xcconfig ] || cp HealthOS/Config.xcconfig.template HealthOS/Config.xcconfig
+
+xcodebuild build \
+  -project HealthOS.xcodeproj \
+  -scheme HealthOS \
+  -destination "platform=iOS Simulator,name=iPhone 17" \
+  -configuration Debug \
+  CODE_SIGNING_ALLOWED=NO \
+  2>&1 | tail -5
+```
+
+**`** BUILD SUCCEEDED **`** → push and create PR
+**`** BUILD FAILED **`** → fix all errors first. Do not push a broken build.
+
+Worktrees that only modify `supabase/` or `docs/` are exempt.
 
 ---
 
@@ -204,7 +226,15 @@ Shared contracts to respect:
 - Data model: [reference to model file or inline schema]
 - API shape: [reference to API contract doc]
 
-When done, commit all changes with a descriptive message."
+When done:
+1. Commit all changes with descriptive messages
+2. If you touched any Swift files, run the build verification:
+   [ -f HealthOS/Config.xcconfig ] || cp HealthOS/Config.xcconfig.template HealthOS/Config.xcconfig
+   xcodebuild build -project HealthOS.xcodeproj -scheme HealthOS \
+     -destination 'platform=iOS Simulator,name=iPhone 17' \
+     -configuration Debug CODE_SIGNING_ALLOWED=NO 2>&1 | tail -5
+3. Fix any build errors before finishing — do NOT leave a broken build.
+4. Report BUILD SUCCEEDED or list any remaining issues."
 ```
 
 ### Agent team prompt (lead)
