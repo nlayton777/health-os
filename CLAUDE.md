@@ -99,13 +99,34 @@ When acting as the lead orchestrator:
 6. **Report blockers immediately** — if a dependency isn't ready, stop and communicate rather than working around it
 7. **Use the PRD as the source of truth** — if requirements are unclear, refer to `docs/design/PRD.md` before guessing
 
+## Build Verification Rule (MANDATORY)
+
+**Every worktree that touches iOS Swift files MUST run a build verification before the PR is created.**
+
+```bash
+xcodebuild build \
+  -project HealthOS.xcodeproj \
+  -scheme HealthOS \
+  -destination "platform=iOS Simulator,name=iPhone 17" \
+  -configuration Debug \
+  CODE_SIGNING_ALLOWED=NO \
+  2>&1 | tail -5
+```
+
+- If `** BUILD SUCCEEDED **` → proceed to push and create PR
+- If `** BUILD FAILED **` → fix all errors before pushing. Do not create a PR with a broken build.
+
+This applies to **all agents** — worker agents in worktrees and the lead agent. No exceptions.
+
+Worktrees that only touch `supabase/` or `docs/` are exempt from the iOS build check.
+
 ---
 
 ## Phase Status
 
 | Phase | Status | Branch |
 |---|---|---|
-| Phase 1: Foundation | Not started | — |
+| Phase 1: Foundation | Complete | PRs #3, #4, #5 |
 | Phase 2: Integrations & Goals | Not started | — |
 | Phase 3: Training Program & Daily Plan | Not started | — |
 | Phase 4: Progress & Retrospective | Not started | — |

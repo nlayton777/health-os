@@ -8,9 +8,10 @@ This document defines the safety layers that protect HealthOS from regressions, 
 
 | Layer | What | When to Set Up | Status |
 |---|---|---|---|
-| **Layer 1** | Pre-commit hooks, Claude Code hooks, xcconfig template | Before any worktree starts | Not started |
-| **Layer 2** | GitHub Actions CI pipeline | In parallel with worktrees (doesn't block work) | Not started |
-| **Layer 3** | Contract compliance script | After Phase 1 merges (needs real code to validate) | Not started |
+| **Layer 1** | Pre-commit hooks, Claude Code hooks, xcconfig template | Before any worktree starts | **Complete** |
+| **Layer 1b** | Manual build verification rule (xcodebuild before every iOS PR) | Before Phase 2 worktrees | **Complete — in CLAUDE.md + workflow docs** |
+| **Layer 2** | GitHub Actions CI pipeline | In parallel with worktrees (doesn't block work) | Pending |
+| **Layer 3** | Contract compliance script | After Phase 1 merges (needs real code to validate) | Ready to start |
 
 ---
 
