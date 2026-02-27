@@ -1,0 +1,2 @@
+# Supabase local dev secrets — never commit these
+.env
