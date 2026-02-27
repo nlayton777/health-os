@@ -1,0 +1,11 @@
+// ============================================================
+// HealthOS Configuration Template
+// ============================================================
+// Copy this file to Config.xcconfig and fill in your values:
+//   cp Config.xcconfig.template Config.xcconfig
+//
+// NEVER commit Config.xcconfig — it is in .gitignore.
+// ============================================================
+
+SUPABASE_URL = https://YOUR_PROJECT_ID.supabase.co
+SUPABASE_ANON_KEY = your-anon-key-here
