@@ -4,7 +4,7 @@ import Foundation
 
 protocol StravaServiceProtocol {
     /// Whether Strava is currently connected.
-    var isConnected: Bool { get }
+    var isConnected: Bool { get async }
 
     /// Build the OAuth authorization URL.
     func buildAuthorizationURL() throws -> URL
@@ -44,8 +44,14 @@ final class StravaService: StravaServiceProtocol {
     // MARK: - Public Interface
 
     var isConnected: Bool {
-        // Check cached state synchronously; use syncData() for updates
-        false
+        get async {
+            do {
+                let integrations = try await SupabaseService.shared.getConnectedIntegrations()
+                return integrations.contains { $0.provider == .strava && $0.isActive }
+            } catch {
+                return false
+            }
+        }
     }
 
     func buildAuthorizationURL() throws -> URL {

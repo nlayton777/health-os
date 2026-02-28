@@ -13,9 +13,10 @@ interface StravaSyncRequest {
 interface StravaSyncResponse {
   success: boolean;
   action: string;
-  activities_synced?: number;
-  metrics_synced?: number;
+  message: string;
+  data?: Record<string, unknown>;
   error?: string;
+  details?: string;
 }
 
 interface StravaActivity {
