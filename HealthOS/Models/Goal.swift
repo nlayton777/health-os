@@ -8,7 +8,7 @@ struct Goal: Identifiable, Codable {
     var title: String
     var description: String?
     var category: GoalCategory
-    var targetValue: Decimal
+    var targetValue: Double
     var targetUnit: String
     var currentValue: Decimal?
     var targetDate: Date?

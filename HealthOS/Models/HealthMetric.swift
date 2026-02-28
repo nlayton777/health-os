@@ -56,4 +56,7 @@ enum HealthCategory: String, Codable, CaseIterable {
     case strain
     case recovery
     case calendarEvent = "calendar_event"
+    case respiratoryRate = "respiratory_rate"
+    case skinTemperature = "skin_temperature"
+    case trainingLoad = "training_load"
 }
