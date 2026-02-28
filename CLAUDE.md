@@ -13,6 +13,7 @@ to generate personalized daily coaching plans aligned with the user's goals.
 
 - **PRD:** `docs/design/PRD.md`
 - **Multi-agent workflow:** `docs/workflow/multi-agent-development.md`
+- **Model selection guide:** `docs/workflow/model-selection-guide.md` — read this before spawning subagents or expensive prompts
 
 ---
 
