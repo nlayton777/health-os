@@ -8,7 +8,7 @@ struct AddGoalView: View {
     @State private var currentStep = 1
     @State private var selectedCategory: GoalCategory = .strength
     @State private var useTemplate = true
-    @State private var selectedTemplate: GoalTemplate = .benchPress
+    @State private var selectedTemplate: GoalTemplate?
     @State private var customTitle = ""
     @State private var targetValue: Decimal = 0
     @State private var targetUnit = ""
@@ -18,6 +18,10 @@ struct AddGoalView: View {
     @State private var testingCadenceWeeks = 8
     @State private var isSaving = false
     @Environment(\.dismiss) var dismiss
+
+    var availableTemplates: [GoalTemplate] {
+        GoalTemplateLoader.shared.templates(for: selectedCategory)
+    }
 
     var body: some View {
         NavigationStack {
@@ -77,7 +81,10 @@ struct AddGoalView: View {
                 .font(.headline)
             VStack(spacing: 12) {
                 ForEach(GoalCategory.allCases, id: \.self) { category in
-                    Button(action: { selectedCategory = category }) {
+                    Button(action: {
+                        selectedCategory = category
+                        selectedTemplate = nil
+                    }) {
                         VStack(spacing: 8) {
                             Image(systemName: category.icon)
                                 .font(.title)
@@ -109,22 +116,31 @@ struct AddGoalView: View {
                 VStack(spacing: 12) {
                     Text("Select a template")
                         .font(.headline)
-                    Picker("Template", selection: $selectedTemplate) {
-                        ForEach(GoalTemplate.allCases, id: \.self) { template in
-                            Text(template.title).tag(template)
+                    if availableTemplates.isEmpty {
+                        Text("No templates available")
+                            .foregroundStyle(.secondary)
+                    } else {
+                        Picker("Template", selection: $selectedTemplate) {
+                            Text("Select one...").tag(nil as GoalTemplate?)
+                            ForEach(availableTemplates) { template in
+                                Text(template.title).tag(template as GoalTemplate?)
+                            }
+                        }
+                        .pickerStyle(.wheel)
+                        if let template = selectedTemplate {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("Test Type: \(template.benchmarkTestType)")
+                                    .font(.caption)
+                                Text("Unit: \(template.targetUnit)")
+                                    .font(.caption)
+                                Text("Test every \(template.defaultCadenceWeeks) weeks")
+                                    .font(.caption)
+                            }
+                            .padding()
+                            .background(.gray.opacity(0.1))
+                            .cornerRadius(8)
                         }
                     }
-                    .pickerStyle(.wheel)
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Description")
-                            .font(.caption.bold())
-                        Text(selectedTemplate.description)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    .padding()
-                    .background(.gray.opacity(0.1))
-                    .cornerRadius(8)
                 }
             } else {
                 VStack(spacing: 12) {
@@ -205,7 +221,7 @@ struct AddGoalView: View {
         case 1:
             return true
         case 2:
-            return useTemplate || !customTitle.isEmpty
+            return useTemplate ? (selectedTemplate != nil) : !customTitle.isEmpty
         case 3:
             return targetValue > 0 && !targetUnit.isEmpty
         case 4:
@@ -219,20 +235,36 @@ struct AddGoalView: View {
         isSaving = true
         defer { isSaving = false }
 
-        let title = useTemplate ? selectedTemplate.title : customTitle
+        let title: String
+        let unit: String
+        let benchmarkType: String?
+        let cadence: Int
+
+        if useTemplate, let template = selectedTemplate {
+            title = template.title
+            unit = template.targetUnit
+            benchmarkType = template.benchmarkTestType
+            cadence = template.defaultCadenceWeeks
+        } else {
+            title = customTitle
+            unit = targetUnit
+            benchmarkType = benchmarkTestType.isEmpty ? nil : benchmarkTestType
+            cadence = testingCadenceWeeks
+        }
+
         let newGoal = Goal(
             id: UUID(),
             userId: UUID(),
             title: title,
-            description: selectedTemplate.description,
+            description: nil,
             category: selectedCategory,
             targetValue: targetValue,
-            targetUnit: targetUnit,
+            targetUnit: unit,
             currentValue: nil,
             targetDate: targetDate,
             priority: priority,
-            benchmarkTestType: benchmarkTestType.isEmpty ? nil : benchmarkTestType,
-            testingCadenceWeeks: testingCadenceWeeks,
+            benchmarkTestType: benchmarkType,
+            testingCadenceWeeks: cadence,
             status: .active,
             metadata: nil,
             createdAt: Date(),
@@ -245,48 +277,6 @@ struct AddGoalView: View {
             dismiss()
         } catch {
             print("Error creating goal: \(error)")
-        }
-    }
-}
-
-// MARK: - Goal Templates
-
-enum GoalTemplate: CaseIterable {
-    case benchPress
-    case squat
-    case deadlift
-    case fiveK
-    case subTenPercentBodyFat
-    case improveHRV
-
-    var title: String {
-        switch self {
-        case .benchPress: "Bench Press Max"
-        case .squat: "Squat Max"
-        case .deadlift: "Deadlift Max"
-        case .fiveK: "Sub-22:00 5K"
-        case .subTenPercentBodyFat: "Get to 10% Body Fat"
-        case .improveHRV: "Improve HRV to 80ms"
-        }
-    }
-
-    var description: String {
-        switch self {
-        case .benchPress: "Increase your maximum barbell bench press."
-        case .squat: "Increase your maximum back squat lift."
-        case .deadlift: "Increase your maximum deadlift lift."
-        case .fiveK: "Run a 5K in under 22 minutes."
-        case .subTenPercentBodyFat: "Achieve lean physique at 10% body fat."
-        case .improveHRV: "Improve heart rate variability for better recovery."
-        }
-    }
-
-    var defaultUnit: String {
-        switch self {
-        case .benchPress, .squat, .deadlift: "lbs"
-        case .fiveK: "minutes"
-        case .subTenPercentBodyFat: "%"
-        case .improveHRV: "ms"
         }
     }
 }
